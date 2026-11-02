@@ -22,8 +22,9 @@ def network_denied(ip, port, family):
         client.settimeout(1)
         try:
             client.connect((ip, port))
-        except OSError:
-            return True
+        except OSError as exc:
+            # A refused port only proves no listener, not network isolation.
+            return exc.errno in {errno.ENETUNREACH, errno.EHOSTUNREACH, errno.EADDRNOTAVAIL, errno.EAFNOSUPPORT}
     return False
 
 

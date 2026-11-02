@@ -1,4 +1,4 @@
-import copy
+import errno
 import importlib.util
 import json
 from pathlib import Path
@@ -89,6 +89,16 @@ class IsolationContractTests(unittest.TestCase):
         self.assertNotIn('self-hosted',workflow)
         self.assertIn('persist-credentials: false',workflow)
         self.assertIn('runs-on: ubuntu-24.04',workflow)
+
+    def test_connection_refusal_is_not_mistaken_for_network_denial(self):
+        probe_spec=importlib.util.spec_from_file_location('synthetic_probe',ROOT/'proof/probe.py')
+        probe=importlib.util.module_from_spec(probe_spec)
+        probe_spec.loader.exec_module(probe)
+        for code,expected in [(errno.ENETUNREACH,True),(errno.EHOSTUNREACH,True),
+                              (errno.ECONNREFUSED,False),(errno.ETIMEDOUT,False)]:
+            with self.subTest(code=code),patch.object(probe.socket,'socket') as sock:
+                sock.return_value.__enter__.return_value.connect.side_effect=OSError(code,'synthetic')
+                self.assertEqual(probe.network_denied('192.0.2.1',18080,probe.socket.AF_INET),expected)
 
 
 if __name__=='__main__': unittest.main()
