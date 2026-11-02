@@ -1,0 +1,40 @@
+name: EJS TEST control
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ejs-control-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  control-static:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Offline contract tests only
+        run: python3 -I -m unittest discover -s tests -v
+
+  synthetic-isolation:
+    if: github.repository == 'cagataybuyuk/ejs-test-control' && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+    needs: control-static
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Fixed synthetic isolation proof; no EJS task
+        run: python3 -I proof/run_isolation_proof.py
+      - name: Remove this run's synthetic containers even after failure
+        if: always()
+        run: python3 -I proof/cleanup.py
