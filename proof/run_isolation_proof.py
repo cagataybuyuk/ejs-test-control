@@ -49,6 +49,11 @@ def verify_config(info):
     host, config = info['HostConfig'], info['Config']
     mounts = info['Mounts']
     require(host['NetworkMode'] == 'none' and not host.get('PortBindings'))
+    require(host.get('PidMode', '') in ('', 'private'))
+    require(host.get('IpcMode', 'private') == 'private')
+    require(host.get('UTSMode', '') == '')
+    require(host.get('CgroupnsMode', 'private') == 'private')
+    require(not host.get('VolumesFrom') and not host.get('Links'))
     require(host['ReadonlyRootfs'] and not host['Privileged'] and not host.get('Devices'))
     require(config['User'] == '65532:65532')
     require(host['CapDrop'] == ['ALL'] and not host.get('CapAdd'))

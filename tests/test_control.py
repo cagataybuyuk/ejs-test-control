@@ -29,7 +29,8 @@ class IsolationContractTests(unittest.TestCase):
         runner.verify_config(data)
 
     def test_dangerous_runtime_variants_are_rejected(self):
-        variants=[('NetworkMode','host'),('ReadonlyRootfs',False),('Privileged',True),
+        variants=[('NetworkMode','host'),('PidMode','host'),('IpcMode','host'),('UTSMode','host'),
+                  ('CgroupnsMode','host'),('VolumesFrom',['host-container']),('Links',['other:host']),('ReadonlyRootfs',False),('Privileged',True),
                   ('Devices',[{'PathOnHost':'synthetic-device'}]),('CapDrop',[]),
                   ('CapAdd',['SYS_ADMIN']),('SecurityOpt',[]),('Memory',0),('MemorySwap',-1),
                   ('NanoCpus',0),('PidsLimit',0),('PortBindings',{'1/tcp':[{}]}),
