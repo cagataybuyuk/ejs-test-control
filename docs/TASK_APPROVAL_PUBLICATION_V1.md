@@ -193,3 +193,14 @@ References:
 - https://github.com/cagataybuyuk/europe-job-scan/issues/68
 - https://github.com/cagataybuyuk/ejs-test-control/actions/runs/41644210860
 - https://docs.google.com/document/d/1LppXUfKPa0-w6c2Q21VMgYtQ1_ZXxQ8Pl0ByvuvsesI/edit
+
+## Local Git proof addendum — 2026-11-03 (independent review required)
+
+See [the disposable fixture evidence](LOCAL_GIT_LEDGER_PROOF.md). Actual local
+push tests show that an identical replay can return success/up-to-date, and a
+semantically illegal state revival can still be a graph-valid fast-forward.
+Future writes therefore need a trusted predecessor/transition validator and a
+unique control-generated claim-attempt nonce, not merely a successful write
+response or a source/run identifier. No code/backend/record is activated by
+this addendum. Local expected-old update-ref behavior must not be substituted
+for unproven GitHub API semantics or permissions.
